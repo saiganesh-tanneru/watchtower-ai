@@ -1,0 +1,15 @@
+# Python virtual environments
+.venv/
+venv/
+
+# Log files and outputs
+logs/
+*.log
+*.csv
+
+# Python cache and compiled files
+__pycache__/
+*.pyc
+
+# macOS metadata files
+.DS_Store
