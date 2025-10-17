@@ -21,8 +21,11 @@ If you need to restore `activity.db`, `logs/`, or `snapshots/` from the archive 
 
 ```bash
 # watchtower-ai (Room Monitor)
+A small local monitor that uses camera input for motion detection, face detection/recognition, greeting, and optional voice commands.
 
-A small local monitor that uses camera input for motion detection, face detection/recognition, greeting, and optional voice commands. This README covers setup, model placement, and common troubleshooting steps so contributors can get the project running quickly.
+Latest release: v0.1
+
+--
 
 ## Quick start (recommended)
 
@@ -33,14 +36,18 @@ python3 -m venv .venv
 source .venv/bin/activate
 ```
 
-2. Upgrade pip and install dependencies:
+2. Upgrade pip and install Python dependencies:
 
 ```bash
 python3 -m pip install --upgrade pip setuptools wheel
 python3 -m pip install -r requirements.txt
 ```
 
-3. Download model files and place them under `models/` (see below).
+3. Download models (use the helper):
+
+```bash
+./scripts/download_models.sh
+```
 
 4. Run the monitor:
 
@@ -50,35 +57,33 @@ python3 -m pip install -r requirements.txt
 python3 room_monitor.py
 ```
 
+The app opens a camera window (OpenCV). Press `q` to quit. If assistant features are enabled, press `a` in the window to type a question.
+
 ## Prerequisites
 
-- macOS (tested) or Linux
+- macOS or Linux
 - Python 3.10+ recommended
-- Homebrew (macOS) for optional system deps
+- Homebrew (macOS) for optional system deps (PortAudio/CMake)
 
 Optional system packages (macOS):
 
 ```bash
-brew install portaudio cmake
-# For better GPU support (optional):
-brew install libomp
+brew install portaudio cmake unzip
 ```
 
-If you have trouble building some packages, see the Troubleshooting section.
+## Models and placement
 
-## Models and where to place them
+Put large model files in `models/` (project root). The code prefers models in `models/`.
 
-Create a `models/` directory in the repo root and put large model files there. The code prefers models in `models/`.
+Required / recommended models:
 
-Recommended files:
+- `models/yolov8n.pt` — YOLOv8 tiny (object detection). The helper script downloads it automatically.
+- `models/vosk-model-en-us-0.22/` — Vosk offline speech model (optional). The helper can optionally download and extract it.
+- `models/ggml-model.bin` — Optional local LLaMA GGML model for on-device assistant features.
 
-- `models/yolov8n.pt` — YOLOv8 tiny (object detection). Download from Ultralytics releases.
-- `models/vosk-model-en-us-0.22/` — Vosk offline speech recognition model folder (optional).
-- `models/ggml-model.bin` — Optional GGML-quantized model for local LLM (llama-cpp-python) if you want on-device AI.
+Example layout:
 
-Example:
-
-```text
+```
 monitor/
   models/
     yolov8n.pt
@@ -86,55 +91,38 @@ monitor/
     ggml-model.bin
   room_monitor.py
   requirements.txt
+  scripts/download_models.sh
 ```
 
-## Optional: OpenAI fallback
+## Assistant & OpenAI fallback
 
-If you want to use OpenAI as a fallback for the assistant features, set:
+If you want assistant features and OpenAI fallback, set the API key in your environment:
 
 ```bash
 export OPENAI_API_KEY="sk-..."
 ```
 
-The script will attempt to use a local LLM first (if available) and fall back to OpenAI if configured.
+The script tries local LLM first (if configured) and falls back to OpenAI if available.
 
-## Running the app
+## Scripts
 
-Start the app with the provided run script or directly with Python:
-
-```bash
-./run_monitor.sh
-# or
-python3 room_monitor.py
-```
-
-The app opens an OpenCV window for the camera feed. Press `q` to quit. If assistant features are enabled, press `a` to type and ask a question.
+- `scripts/download_models.sh` — download YOLO and optionally Vosk model into `models/`.
 
 ## Troubleshooting
 
-- `vosk` install errors: pick `vosk==0.3.44` and install PortAudio first (macOS: `brew install portaudio`). If `pyaudio` fails to build, install `sounddevice` and update the script to use it.
-- `llama-cpp-python` installation: requires CMake and a compatible GGML model. See the project README for platform-specific notes.
-- Camera not available: ensure no other app (Zoom, Photo Booth) is using the camera.
-- TTS not working on macOS: ensure `osascript` is available (default) and the project can run `say` via AppleScript.
+- Vosk installation: use `vosk==0.3.44`. On macOS install PortAudio first (`brew install portaudio`) before `pip install pyaudio`.
+- If `pyaudio` fails to build, install `sounddevice` and adapt the script to use it instead.
+- LLaMA local models: `llama-cpp-python` requires CMake and being careful about model size; use 7B GGML for moderate machines.
+- If the camera is unavailable, close other apps that may use the camera.
 
-## Development & contribution notes
+## Contributing
 
-- `.gitignore` excludes `models/` and runtime artifacts. Put large or private models in `models/` and do not commit them.
-- Use the `models/` directory to keep project root clean.
+Pull requests welcome. Please open issues for feature requests or bug reports. Consider adding small, focused changes and tests where possible.
 
-## Restore archived runtime files
+## License
 
-If you previously ran the cleanup and archived logs or the DB, restore them with:
+This project is licensed under the MIT License — see `LICENSE`.
 
-```bash
-mv ~/monitor-archives/activity.db ./
-mv ~/monitor-archives/logs ./
-```
+--
 
-## Next improvements (ideas)
-
-- Helper script `scripts/download_models.sh` to fetch YOLO/Vosk models automatically.
-- GitHub Actions to run a lint/test workflow on push.
-- Add a small web UI for live monitoring and logs.
-
-If you'd like, I can add any of the above improvements or a helper script to download models automatically.
+If you'd like, I can add GitHub Actions to run `python -m py_compile` on pushes and create a small `scripts/bootstrap.sh` to bootstrap the environment.
