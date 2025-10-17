@@ -1,3 +1,11 @@
-
 opencv-python
 numpy
+mediapipe
+ultralytics
+whisper-cpp
+llama-cpp-python
+torch
+transformers
+duckduckgo_search
+requests
+beautifulsoup4

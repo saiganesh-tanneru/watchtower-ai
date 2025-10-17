@@ -1,0 +1,52 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+env/
+.venv/
+.env
+
+# macOS
+.DS_Store
+
+# Logs and databases
+*.log
+logs/
+activity.db
+*.sqlite
+*.sqlite3
+
+# Large models / binaries
+*.pt
+models/
+vosk-model*/
+whisper-model*/
+*.bin
+
+# Project data / snapshots / faces (may contain sensitive data)
+snapshots/
+faces/encodings.json
+faces/*.db
+
+# IDEs and editors
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Testing
+.pytest_cache/
+
+# Packaging
+*.egg-info/
+dist/
+build/
+
+# Misc
+*.pem
+*.key
+.env.local
+secrets.json
